@@ -1,0 +1,2 @@
+alias m="cd /var/www/mage2"
+alias mt="m && php dev/tools/tests.php -- type::all"
