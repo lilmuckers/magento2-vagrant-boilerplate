@@ -259,10 +259,27 @@ file { "/etc/profile.d/magento.sh":
 # Install magento2 with composer #
 ##################################
 
-exec { 'composer install':
-  command => '/usr/local/bin/composer install',
-  path    => '/var/www/mage2/',
+file { '/home/vagrant/.composer':
+  ensure => 'directory',
+  owner  => 'vagrant',
+  group  => 'vagrant',
+  mode   => 0775,
   require => Class['composer'],
+}
+
+
+file { "/home/vagrant/.composer/auth.json":
+    ensure => present,
+    source => '/vagrant/setupconfig/composer_auth.json',
+    require => File['/home/vagrant/.composer']
+}
+
+exec { 'composer install':
+  command => 'composer install',
+  environment => ["COMPOSER_HOME=/usr/local/bin"],
+  path    => '/usr/bin:/usr/local/bin',
+  cwd     => '/var/www/mage2',
+  require => File['/home/vagrant/.composer/auth.json'],
 }
 
 #########
