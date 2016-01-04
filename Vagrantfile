@@ -41,16 +41,9 @@ Vagrant.configure("2") do |config|
     vb.customize ["modifyvm", :id, "--memory", "2048"]
   end
 
-  if Vagrant::Util::Platform.windows?
-    config.vm.synced_folder ".", "/var/www/mage2", :mount_options => ["dmode=777", "fmode=777"]
-  else
-    config.vm.synced_folder ".", "/var/www/mage2", :nfs => { :mount_options => ["dmode=777", "fmode=777"] }
+  config.vm.synced_folder ".", "/vagrant"
+  config.vm.synced_folder ".", "/var/www/mage2", id: "vagrant-root", :owner=>"www-data",:group=>"www-data",:mount_options=>["dmode=777,fmode=777"]
 
-    #rsync_args = ['--verbose', '--archive', '-z']
-    #config.vm.synced_folder ".", "/vagrant",
-    #  rsync__args: rsync_args, rsync__exclude: ['.vagrant/'], rsync__auto: true, type: 'rsync'
-
-  end
 
   config.vm.provider :virtualbox do |virtualbox|
     virtualbox.customize ["modifyvm", :id, "--memory", "2048"]

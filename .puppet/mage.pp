@@ -185,14 +185,23 @@ file { '/etc/apache2/sites-enabled/001-stats':
   notify  => Service['apache2']
 }
 
+
+file { '/var/www/stats':
+  ensure => 'directory',
+  owner  => 'vagrant',
+  group  => 'vagrant',
+  mode   => 0775,
+  require => Package['apache2'],
+}
+
 file { '/var/www/stats/info.php':
   source  => '/vagrant/.puppet/files/info.php',
-  require => Package['apache2']
+  require => File['/var/www/stats'],
 }
 
 file { '/var/www/stats/opcache.php':
   source  => '/vagrant/.puppet/files/opcache.php',
-  require => Package['apache2']
+  require => File['/var/www/stats'],
 }
 
 ##############
@@ -251,8 +260,9 @@ file { "/etc/profile.d/magento.sh":
 ##################################
 
 exec { 'composer install':
-  command   => 'cd /vagrant && composer install'
-  require => Class['composer']
+  command => '/usr/local/bin/composer install',
+  path    => '/var/www/mage2/',
+  require => Class['composer'],
 }
 
 #########
