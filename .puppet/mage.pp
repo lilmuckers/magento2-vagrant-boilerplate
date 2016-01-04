@@ -267,13 +267,6 @@ file { '/home/vagrant/.composer':
   require => Class['composer'],
 }
 
-
-file { "/home/vagrant/.composer/auth.json":
-    ensure => present,
-    source => '/vagrant/setupconfig/composer_auth.json',
-    require => File['/home/vagrant/.composer']
-}
-
 exec { 'composer install':
   command => 'composer install',
   environment => ["COMPOSER_HOME=/usr/local/bin"],

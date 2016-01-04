@@ -1,6 +1,6 @@
 /.vagrant
 
-
+/auth.json
 /.buildpath
 /.cache
 /.metadata
@@ -17,6 +17,8 @@ atlassian*
 /app/etc
 /app/i18n/magento
 /app/*.*
+
+/phpserver
 
 /bin
 

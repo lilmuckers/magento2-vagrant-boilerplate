@@ -7,6 +7,4 @@ foreach($_data as $_key => $_value) {
     $_command .= "--{$_key}=".escapeshellarg($_value).' ';
 }
 
-var_dump($_command);
-die();
 exec($_command);
