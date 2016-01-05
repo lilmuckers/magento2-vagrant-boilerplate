@@ -100,7 +100,7 @@ exec { 'set-mysql-password':
 
 exec { 'create-mage-db':
   unless  => '/usr/bin/mysql -uroot -pmage2 -e "use mage2"',
-  command => '/usr/bin/mysql -uroot -pmage2 -e "create database mage2; grant all on mage2.* to root@localhost identified by \'mage2\';"',
+  command => '/usr/bin/mysql -uroot -pmage2 -e "create database mage2; grant all on mage2.* to root@localhost identified by \'mage2\'; grant all on mage2.* to root@192.168.33.1 identified by \'mage2\';"',
   require => Exec['set-mysql-password'],
 }
 
