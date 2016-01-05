@@ -1,47 +1,25 @@
-Forked from https://github.com/rgranadino/mage2_vagrant - with modifications to fit my personal tastes/needs
+## Magento 2 Vagrant Box
 
+A simple way to get an integrator developer instance of Magento2 up and running. It consists of a Debian Wheezy box, provisioned via Puppet. The provider is VirtualBox, and it will install apache2 +fastcgi, php, php-fpm, mysql and any other necessary dependancies.
 
-## Magento2 Vagrant Box
-A simple way to get magento2 up and running. It consists of a Debian Wheezy box provised via Puppet. The provider is Virtual Box. It will install apache2 +fastcgi, php, php-fpm, mysql and any other necessary dependancies.
+Magento 2 is using the community edition composer metapackage as a source. This means developers can easily use this as a basis for their production instance, plugging in a few more deployment actions. This will also enhance upgradability and bigfixing (as these will be distributed to the composer repository without requiring any direct patching, and it keeps the core code away from the developer to avoid "hacks").
 
-The Magento 2 repository is a git submodule and can be edited/explored from the host machine. It is accessed by the guest via shared directories.
+This is based heavily on https://github.com/rgranadino/mage2_vagrant - with modifications to fit my personal tastes/needs
 
 ### Usage
 #### Installation
-1. Clone this repository: `git clone --recursive https://github.com/rgranadino/mage2_vagrant.git`
-2. Navigate into the repository via `cd`
-2. **IMPORTANT**: If you cloned the repository without the *--recursive* param, you need to initialize the required submodules: `git submodule update --init --recursive`
-3. Start up virtual machine: `vagrant up`
-4. Point a host name to 192.168.56.10 in /etc/hosts `echo '192.168.56.10 mage2.dev' >> /etc/hosts`
->NOTE: Some composer dependancies require git. Agent Forwarding over SSH is enabled in the Vagrant file but you must have `ssh-agent` running and your key added. Running `ssh-add` should add the default key to the identities list, which presumably is the same key used to access github/bitbucket. You'll may also need to create a API access token in github, instructions can be found [here](http://devdocs.magento.com/guides/v2.0/install-gde/trouble/git/tshoot_rate-limit.html):
-5. Once the machine completes provisioning, SSH to the server (`vagrant ssh`).
-6. Add your Magento Connect authentication credentials to the global composer auth.json:
-
-  * Open or create the file `~/.composer/auth.json`
-  * Add the Magento Connect authentication credentials (if you don't have any, please check [here](http://devdocs.magento.com/guides/v2.0/install-gde/prereq/connect-auth.html) on how to create them):
-
-  ```json
-  {
-      "http-basic": {
-          "repo.magento.com": {
-              "username": "<public key>",
-              "password": "<private key>"
-          }
-      }
-  }
-  ```
-
- * Or you can use the composer config command: `composer.phar global config http-basic.repo.magento.com <public_key> <private_key>`
-
-7. Install Magento 2 by running:
-
- * Via CLI (recommended)
-
-   * `reinstall` (Magento **without** sample data) or `reinstall -s` (Magento **with** sample data).
-
- * Via Web Installer
-
-   * Please go to the Magento directory within the vagrant box (`cd /vagrant/data/magento2/`) and run `composer install`. Then open 'http://mage2.dev/setup' in your browser and go through the installation process.
+1. Clone this repository: `git clone --recursive https://github.com/lilmuckers/magento2-vagrant-boilerplate.git`
+2. Navigate to the repository in the command line via `cd`
+  * **IMPORTANT**: If you cloned the repository without the *--recursive* param, you need to initialize the required submodules: `git submodule update --init --recursive`
+3. Start up the virtual machine: `vagrant up`
+4. Configure composer `auth.json` in the project root. (see `setupconfig/auth.json.template` for fields)
+  * Magento auth keys: http://devdocs.magento.com/guides/v2.0/install-gde/prereq/connect-auth.html
+  * Github oauth token: https://help.github.com/articles/creating-an-access-token-for-command-line-use/
+5. If you are **online** I have set up a domain on my personal DNS for the VM so no DNS config will be needed: http://dev.patrick-mckinley.com/
+  * If you are **offline** you will need to set a hostfile change: `echo '192.168.33.10 'dev.patrick-mckinley.com' >> /etc/hosts`
+6. Once the machine completes provisioning, SSH to the server: `vagrant ssh`
+7. Install magento2 by running `cd /var/www/mage2 && composer install && reinstall`
+  * This may take a while to run as it will download Magento 2 from scratch and create a composer.lock file.
 
 #### Updating
 1. From the host machine run `git pull && git submodule update --init && vagrant provision`.
@@ -49,9 +27,11 @@ The Magento 2 repository is a git submodule and can be edited/explored from the 
 provision within the guest machine in the event it's not done after updating.
 2. If you want to start from a clean slate run: `reinstall` from within the guest machine. This will uninstall the application and reinstall it from scratch.
 
+#### Configuration
+To change/view any of the default configuration for magento2 in this setup - view the `setupconfig/mage-settings.ini`. It uses the standard magento setup arguments detailed here: http://devdocs.magento.com/guides/v2.0/install-gde/install/cli/install-cli-install.html#instgde-install-cli-magento
 
 #### Shell Aliases / Scripts
-* `m` - cd into the base magento directory: /vagrant/data/magento2
+* `m` - cd into the base magento directory: /var/www/mage2
 * `reinstall` - run magento shell uninstall script with the `cleanup_database` flag and run installation again, uses `http://mage2.dev` as base URL
  * `reinstall -s` - install magento with sample data
 * `mt` - run bulk magento test suites
@@ -59,15 +39,15 @@ provision within the guest machine in the event it's not done after updating.
 #### Status and Debug utilities
 A status vhost on port 88 has been setup to view apache's server status, php-fpm status as well as some other utilities.
 
-* http://mage2.dev:88/server-status
-* http://mage2.dev:88/fpm-status
-* http://mage2.dev:88/info.php
-* http://mage2.dev:88/opcache.php
-* http://mage2.dev:88/webgrind
+* http://dev.patrick-mckinley.com:88/server-status
+* http://dev.patrick-mckinley.com:88/fpm-status
+* http://dev.patrick-mckinley.com:88/info.php
+* http://dev.patrick-mckinley.com:88/opcache.php
 
 ### Magento Admin User
 * Username: admin
 * Password: password123
+* Admin URL: http://dev.patrick-mckinley.com/admin
 
 ### Database Info
 * Username: root
@@ -80,19 +60,10 @@ A status vhost on port 88 has been setup to view apache's server status, php-fpm
 
 It's also possible to use `vagrant ssh` from within the project directory
 
-## File Structure
 
-### Host Machine / Project directory
-* manifests/mage.pp - Puppet manifest file
-* files/ - contains various service configuration files
-  * bash_aliases - vagrant user bash aliases script
-  * fastcgi.conf - fastcgi configuration
-  * reinstall.sh - magento reinstall wrapper script
-  * site.conf - apache virtual host configuration
-  * www.conf - php-fpm pool configuration
-  * xdebug.ini - php xdebug configuration file
-* data/magento2 - Git submodule to Magento2 Github repository: https://github.com/magento/magento2
-* data/magento2-sample-data - Git submodule to Magento2 Sample Data Github repository: https://github.com/magento/magento2-sample-data
-
-### Guest Machine
-* /vagrant/data/magento2 - Apache Document Root
+### TODO
+* mysql (my.cnf) config allow outside access
+* add nicer $PS1
+* Disable xdebug for PHP cli for composer, and alias php command to enable xdebug (see composer xdebug page)
+* fix running of composer install command on provision
+* script to install sample data
