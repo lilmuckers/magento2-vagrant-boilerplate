@@ -267,14 +267,6 @@ file { '/home/vagrant/.composer':
   require => Class['composer'],
 }
 
-exec { 'composer install':
-  command => 'composer install',
-  environment => ["COMPOSER_HOME=/usr/local/bin"],
-  path    => '/usr/bin:/usr/local/bin',
-  cwd     => '/var/www/mage2',
-  require => File['/home/vagrant/.composer/auth.json'],
-}
-
 #########
 # crons #
 #########
